@@ -73,10 +73,10 @@
 
 ## 9. Phase 3 (Optional - Learning System)
 
-- [ ] 9.1 Design instinct storage structure at `~/.openspec/instincts/`
-- [ ] 9.2 Implement instinct JSON schema (id, trigger, action, confidence, domain)
-- [ ] 9.3 Create `/opsx:learn` command for pattern extraction
-- [ ] 9.4 Create `/opsx:evolve` command for instinct-to-skill promotion
-- [ ] 9.5 Implement confidence scoring algorithm
-- [ ] 9.6 Add instinct status display command
+- [x] 9.1 Design instinct storage structure at `~/.openspec/instincts/`
+- [x] 9.2 Implement instinct JSON schema (id, trigger, action, confidence, domain)
+- [x] 9.3 Create `/opsx:learn` command for pattern extraction
+- [x] 9.4 Create `/opsx:evolve` command for instinct-to-skill promotion
+- [x] 9.5 Implement confidence scoring algorithm
+- [x] 9.6 Add instinct status display command
 - [ ] 9.7 Document learning system in docs

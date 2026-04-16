@@ -17,6 +17,10 @@ import {
   getVerifyChangeSkillTemplate,
   getOnboardSkillTemplate,
   getOpsxProposeSkillTemplate,
+  getLearnSkillTemplate,
+  getEvolveSkillTemplate,
+  getInstinctStatusSkillTemplate,
+  getLearningSystemSkillTemplate,
   getOpsxExploreCommandTemplate,
   getOpsxBrainstormCommandTemplate,
   getOpsxNewCommandTemplate,
@@ -69,6 +73,10 @@ export function getSkillTemplates(workflowFilter?: readonly string[]): SkillTemp
     { template: getVerifyChangeSkillTemplate(), dirName: 'openspec-verify-change', workflowId: 'verify' },
     { template: getOnboardSkillTemplate(), dirName: 'openspec-onboard', workflowId: 'onboard' },
     { template: getOpsxProposeSkillTemplate(), dirName: 'openspec-propose', workflowId: 'propose' },
+    { template: getLearnSkillTemplate(), dirName: 'openspec-learn', workflowId: 'learn' },
+    { template: getEvolveSkillTemplate(), dirName: 'openspec-evolve', workflowId: 'evolve' },
+    { template: getInstinctStatusSkillTemplate(), dirName: 'openspec-instinct-status', workflowId: 'instinct-status' },
+    { template: getLearningSystemSkillTemplate(), dirName: 'openspec-learning-system', workflowId: 'learning-system' },
   ];
 
   if (!workflowFilter) return all;

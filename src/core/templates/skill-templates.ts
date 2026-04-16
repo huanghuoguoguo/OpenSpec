@@ -24,3 +24,13 @@ export {
   getCodeQualityReviewerPromptTemplate,
   getTwoStageReviewSkillTemplate,
 } from './workflows/two-stage-review.js';
+export {
+  getLearnSkillTemplate,
+  getEvolveSkillTemplate,
+  getInstinctStatusSkillTemplate,
+  getLearningSystemSkillTemplate,
+  INSTINCT_DOMAINS,
+  CONFIDENCE_LEVELS,
+  type Instinct,
+  getInstinctSchemaDescription,
+} from './workflows/learning-system.js';

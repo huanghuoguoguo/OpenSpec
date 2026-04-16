@@ -8,9 +8,9 @@ import {
 
 describe('skill-generation', () => {
   describe('getSkillTemplates', () => {
-    it('should return all 12 skill templates', () => {
+    it('should return all 16 skill templates', () => {
       const templates = getSkillTemplates();
-      expect(templates).toHaveLength(12);
+      expect(templates).toHaveLength(16);
     });
 
     it('should have unique directory names', () => {
@@ -36,6 +36,10 @@ describe('skill-generation', () => {
       expect(dirNames).toContain('openspec-verify-change');
       expect(dirNames).toContain('openspec-onboard');
       expect(dirNames).toContain('openspec-propose');
+      expect(dirNames).toContain('openspec-learn');
+      expect(dirNames).toContain('openspec-evolve');
+      expect(dirNames).toContain('openspec-instinct-status');
+      expect(dirNames).toContain('openspec-learning-system');
     });
 
     it('should have valid template structure', () => {
