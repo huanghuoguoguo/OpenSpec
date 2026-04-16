@@ -11,6 +11,7 @@ For workflow patterns and when to use each command, see [Workflows](workflows.md
 | Command | Purpose |
 |---------|---------|
 | `/opsx:propose` | Create a change and generate planning artifacts in one step |
+| `/opsx:brainstorm` | Adaptive collaborative ideation before `/opsx:propose` |
 | `/opsx:explore` | Think through ideas before committing to a change |
 | `/opsx:apply` | Implement tasks from the change |
 | `/opsx:archive` | Archive a completed change |
@@ -67,6 +68,122 @@ AI:  Created openspec/changes/add-dark-mode/
 **Tips:**
 - Use this for the fastest end-to-end path
 - If you want step-by-step artifact control, enable expanded workflows and use `/opsx:new` + `/opsx:continue`
+- If you want guided ideation before proposing, use `/opsx:brainstorm` first
+
+---
+
+### `/opsx:brainstorm`
+
+Adaptive collaborative ideation before `/opsx:propose`. Automatically adjusts depth based on problem complexity.
+
+**Syntax:**
+```
+/opsx:brainstorm [topic]
+```
+
+**Arguments:**
+| Argument | Required | Description |
+|----------|----------|-------------|
+| `topic` | No | What you want to brainstorm or explore |
+
+**What it does:**
+- Assess complexity and select appropriate exploration mode
+- Simple problems: 2-3 questions, lightweight context gathering (~300 tokens)
+- Complex problems: architecture scan, visual diagrams, section-by-section design (~2000 tokens)
+- Proposes 2-3 approaches with explicit recommendation
+- Transitions to `/opsx:propose` when ready to formalize
+
+**Complexity Signals:**
+
+| Simple | Complex |
+|--------|---------|
+| Single domain | Cross-cutting concern |
+| Existing pattern extension | New architecture |
+| Bounded scope (1-3 files) | Multiple integrations |
+| Clear feature request | Performance/security implications |
+
+**Example (Simple):**
+```text
+You: /opsx:brainstorm add logout button
+
+AI:  Assessing complexity... Simple (single component, bounded scope).
+
+     I see domains: [ui, auth]. This would be in **ui**.
+
+     Three approaches:
+     **A. Header component** - Add toggle there, simple. I recommend this.
+     **B. Settings page** - More discoverable, but extra navigation.
+     **C. Both** - Maximum discoverability, more work.
+
+     Which direction?
+
+You: A
+
+AI:  Scope: logout button in header, clears session.
+     Ready. Run /opsx:propose add-logout-button.
+```
+
+**Example (Complex):**
+```text
+You: /opsx:brainstorm add authentication system
+
+AI:  Assessing complexity... Complex (cross-cutting, new architecture).
+
+     Let me scan relevant areas...
+     [Reads CLAUDE.md, scans src/auth/, src/api/]
+
+     ┌─────────────────────────────────────┐
+     │      CURRENT ARCHITECTURE           │
+     ├─────────────────────────────────────┤
+     │                                     │
+     │   ┌─────────┐    ┌─────────┐       │
+     │   │  API    │───▶│ Session │       │
+     │   │ Routes  │    │  Store  │       │
+     │   └─────────┘    └─────────┘       │
+     │        │              │            │
+     │        ▼              ▼            │
+     │   ┌─────────┐    ┌─────────┐       │
+     │   │Middleware│   │ Cookies │       │
+     │   └─────────┘    └─────────┘       │
+     │                                     │
+     └─────────────────────────────────────┘
+
+     Three approaches:
+     | Approach | Pros | Cons | Complexity |
+     |----------|------|------|------------|
+     | A. JWT   | Stateless, scalable | Token management | Medium |
+     | B. Session | Simple, familiar | Server state | Low |
+     | C. OAuth | Third-party support | Complex setup | High |
+
+     I recommend **A (JWT)** because your API is stateless.
+
+     Architecture approach: [section content]
+     Approve this section?
+
+You: Yes
+
+AI:  Component breakdown: [section content]
+     Approve?
+
+You: Yes
+
+[Continues through data flow, error handling sections]
+
+AI:  Design solid. Options:
+     1. /opsx:propose add-auth-system
+     2. Continue exploring
+     3. /opsx:explore (free-form)
+```
+
+**Tips:**
+- Use when you want guidance on approach before committing
+- Automatically adapts depth - no need to choose mode manually
+- Can switch to `/opsx:explore` if you want free-form thinking
+- Passes context to `/opsx:propose` - won't re-ask clarified questions
+
+**vs. Explore:**
+- Brainstorm: Structured, convergent, drives toward decision
+- Explore: Free-form, stance-based, thinking is the value
 
 ---
 

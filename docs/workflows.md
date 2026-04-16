@@ -96,6 +96,66 @@ AI:  ✓ Merged specs
 
 **Best for:** Small to medium features, bug fixes, straightforward changes.
 
+### Brainstorm Before Propose
+
+When you want collaborative ideation before committing to a change:
+
+```text
+/opsx:brainstorm ──► /opsx:propose ──► /opsx:apply ──► /opsx:archive
+```
+
+**Example conversation:**
+
+```text
+You: /opsx:brainstorm add dark mode
+
+AI:  Assessing complexity... This looks simple (single domain, UI-only).
+
+     I see domains: [ui, auth]. Dark mode would be in **ui**.
+
+     Three approaches:
+     **A. CSS variables** - Simple, works with existing CSS. I recommend this.
+     **B. Theme Provider** - More control, adds context overhead.
+     **C. CSS-in-JS** - Dynamic, but needs new dependency.
+
+     Which direction?
+
+You: A, CSS variables
+
+AI:  Scope: toggle in header + CSS variables.
+     Out: custom themes, per-page overrides.
+
+     Confirm?
+
+You: Yes
+
+AI:  Ready to formalize. Run /opsx:propose add-dark-mode to create artifacts.
+```
+
+**Adaptive Depth:**
+
+Brainstorm automatically adjusts based on complexity:
+
+| Complexity | Behavior |
+|------------|----------|
+| **Simple** | 2-3 questions, specs folder + CLAUDE.md only, ~300 tokens |
+| **Complex** | Architecture scan, ASCII diagrams, section-by-section design, ~2000 tokens |
+
+Complexity signals:
+- **Simple**: Single domain, existing pattern, bounded scope
+- **Complex**: Cross-cutting, new architecture, multiple integrations
+
+**Best for:** Features where you want to explore options before committing, need guidance on approach, or want "SP-style" brainstorming without token waste.
+
+**vs. Explore:**
+
+| Aspect | `/opsx:brainstorm` | `/opsx:explore` |
+|--------|-------------------|-----------------|
+| Structure | Guided, convergent | Free-form, stance-based |
+| Questions | Multiple choice, one/turn | Open threads |
+| Goal | Reach proposal-ready | Thinking is the value |
+| Best for | Need decisions | Need to think |
+
 ### Exploratory
 
 When requirements are unclear or you need to investigate first:
