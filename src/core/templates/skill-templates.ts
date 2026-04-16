@@ -19,3 +19,8 @@ export { getVerifyChangeSkillTemplate, getOpsxVerifyCommandTemplate } from './wo
 export { getOnboardSkillTemplate, getOpsxOnboardCommandTemplate } from './workflows/onboard.js';
 export { getOpsxProposeSkillTemplate, getOpsxProposeCommandTemplate } from './workflows/propose.js';
 export { getFeedbackSkillTemplate } from './workflows/feedback.js';
+export {
+  getSpecReviewerPromptTemplate,
+  getCodeQualityReviewerPromptTemplate,
+  getTwoStageReviewSkillTemplate,
+} from './workflows/two-stage-review.js';

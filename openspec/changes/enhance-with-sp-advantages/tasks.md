@@ -65,11 +65,11 @@
 
 ## 8. Phase 2 (Optional - Two-Stage Review)
 
-- [ ] 8.1 Add `--two-stage` flag option to schema config
-- [ ] 8.2 Create spec-reviewer subagent prompt template
-- [ ] 8.3 Create code-quality-reviewer subagent prompt template
-- [ ] 8.4 Implement review loop mechanism (max 3 iterations)
-- [ ] 8.5 Document two-stage review usage
+- [x] 8.1 Add `--two-stage` flag option to schema config
+- [x] 8.2 Create spec-reviewer subagent prompt template
+- [x] 8.3 Create code-quality-reviewer subagent prompt template
+- [x] 8.4 Implement review loop mechanism (max 3 iterations)
+- [x] 8.5 Document two-stage review usage
 
 ## 9. Phase 3 (Optional - Learning System)
 
