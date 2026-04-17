@@ -555,6 +555,156 @@ openspec/
 
 **Spec evolution.** Specs grow organically as changes are archived. Each archive merges its deltas, building up a comprehensive specification over time.
 
+## Learning System
+
+OpenSpec includes an instinct-based learning system that captures patterns from sessions and evolves them into reusable knowledge.
+
+### The Learning Flow
+
+```
+Session Activity
+      |
+      v
++-------------------------+
+|  Pattern Detection      |
+|  - User corrections     |
+|  - Error resolutions    |
+|  - Repeated workflows   |
++----------+--------------+
+           |
+           v
++-------------------------+
+|  Instinct Creation      |
+|  - trigger: when applies|
+|  - action: what to do   |
+|  - confidence: 0.3      |
+|  - evidence: why        |
++----------+--------------+
+           |
+           | reinforced across sessions
+           v
++-------------------------+
+|  Confidence Growth      |
+|  0.3 → 0.5 → 0.7 → 0.9  |
++----------+--------------+
+           |
+           | cluster by domain
+           v
++-------------------------+
+|  Evolution to Skills    |
+|  (requires confidence   |
+|   >= 0.7, 3+ related)   |
++-------------------------+
+```
+
+### Instincts
+
+An instinct is an atomic learned behavior:
+
+```json
+{
+  "id": "prefer-functional-style",
+  "trigger": "when writing new functions",
+  "action": "Use functional patterns over classes when appropriate",
+  "confidence": 0.7,
+  "domain": "code-style",
+  "evidence": [
+    "User corrected class-based approach on 2026-01-15",
+    "5 instances of functional preference observed"
+  ]
+}
+```
+
+**Key properties:**
+
+| Property | Purpose |
+|----------|---------|
+| `id` | Unique identifier (kebab-case) |
+| `trigger` | When this instinct applies |
+| `action` | What behavior to take |
+| `confidence` | How certain (0.3-0.9) |
+| `domain` | Category for grouping |
+| `evidence` | Observations supporting this instinct |
+
+### Confidence Levels
+
+Instincts evolve through confidence levels:
+
+| Score | Label | How it's used |
+|-------|-------|---------------|
+| 0.3 | tentative | First observation, suggested only |
+| 0.5 | moderate | Repeated across sessions, applied when relevant |
+| 0.7 | strong | User confirmed or no corrections, auto-approved |
+| 0.9 | near-certain | Core behavior, always applies |
+
+**Confidence increases when:**
+- Same pattern observed in multiple sessions
+- User explicitly confirms preference
+- No corrections for behaviors using this instinct
+
+### Instinct Domains
+
+Instincts are grouped by domain:
+
+| Domain | Examples |
+|--------|----------|
+| `code-style` | Naming conventions, functional vs class, magic numbers |
+| `testing` | TDD, table-driven tests, coverage requirements |
+| `git` | Commit message style, branching, PR workflow |
+| `debugging` | Log preferences, error investigation patterns |
+| `workflow` | Tool preferences, command usage patterns |
+| `security` | Validation patterns, credential handling |
+| `tooling` | Editor preferences, CLI tool choices |
+
+### Evolution to Skills
+
+Instincts evolve into skills when:
+- **Domain cluster**: 3+ instincts in same domain
+- **High confidence**: All >= 0.7
+- **Coherent pattern**: Instincts form logical group
+
+**Example evolution:**
+```
+testing domain cluster:
+- write-tests-first (0.9)
+- prefer-table-driven-tests (0.8)
+- always-run-tests-before-commit (0.7)
+
+→ Evolves into skill: openspec-test-driven-development
+```
+
+### Storage
+
+Learning system data is stored locally:
+
+```
+~/.openspec/
+├── instincts/
+│   ├── prefer-functional-style.json
+│   ├── write-tests-first.json
+│   └── index.json         # Registry with confidence scores
+└── skills/
+    └── evolved/
+        └── openspec-test-driven-development/
+            └── SKILL.md
+```
+
+### Privacy
+
+The learning system is privacy-conscious:
+- **Only patterns stored** — no actual code or conversation content
+- **Evidence is descriptive** — describes what happened, not the text
+- **Local storage** — all data stays in `~/.openspec/`
+- **User controlled** — you decide what gets exported
+
+### Commands
+
+| Command | Purpose |
+|---------|---------|
+| `/opsx:learn` | Extract patterns from current session |
+| `/opsx:evolve` | Promote high-confidence instincts to skills |
+| `/opsx:instinct-status` | Review all instincts and confidence scores |
+
 ## How It All Fits Together
 
 ```

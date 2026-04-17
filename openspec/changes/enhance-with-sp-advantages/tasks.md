@@ -79,4 +79,4 @@
 - [x] 9.4 Create `/opsx:evolve` command for instinct-to-skill promotion
 - [x] 9.5 Implement confidence scoring algorithm
 - [x] 9.6 Add instinct status display command
-- [ ] 9.7 Document learning system in docs
+- [x] 9.7 Document learning system in docs

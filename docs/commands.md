@@ -16,6 +16,14 @@ For workflow patterns and when to use each command, see [Workflows](workflows.md
 | `/opsx:apply` | Implement tasks from the change |
 | `/opsx:archive` | Archive a completed change |
 
+### Learning System
+
+| Command | Purpose |
+|---------|---------|
+| `/opsx:learn` | Extract patterns from session into instincts |
+| `/opsx:evolve` | Promote high-confidence instincts to skills |
+| `/opsx:instinct-status` | View all instincts with confidence scores |
+
 ### Expanded Workflow Commands (custom workflow selection)
 
 | Command | Purpose |
@@ -722,6 +730,184 @@ AI:  Welcome to OpenSpec!
 - Uses real code, not toy examples
 - Creates a real change you can keep or discard
 - Takes 15-30 minutes to complete
+
+---
+
+## Learning System Commands
+
+OpenSpec includes an instinct-based learning system that captures patterns from sessions and evolves them into reusable knowledge. These commands manage the learning process.
+
+### `/opsx:learn`
+
+Extract patterns from the current session into instincts. Captures user corrections, error resolutions, and repeated workflows.
+
+**Syntax:**
+```
+/opsx:learn
+```
+
+**What it does:**
+- Analyzes session for reusable patterns
+- Creates instinct entries with confidence scores
+- Stores patterns at `~/.openspec/instincts/`
+- Starts at confidence 0.3 (tentative)
+
+**Instinct structure:**
+```json
+{
+  "id": "prefer-functional-style",
+  "trigger": "when writing new functions",
+  "action": "Use functional patterns over classes when appropriate",
+  "confidence": 0.7,
+  "domain": "code-style",
+  "evidence": [
+    "User corrected class-based approach on 2026-01-15"
+  ]
+}
+```
+
+**Pattern types captured:**
+- User corrections ("No, use X instead")
+- Error resolutions (build/test failures that were fixed)
+- Repeated workflows (consistent preferences)
+
+**Example:**
+```
+You: /opsx:learn
+
+AI:  Analyzing session patterns...
+
+     Patterns detected:
+     - User preferred table-driven tests (testing domain)
+     - User rejected magic numbers (code-style domain)
+
+     Created instincts:
+     ✓ prefer-table-driven-tests (confidence: 0.3)
+     ✓ avoid-magic-numbers (confidence: 0.3)
+
+     Instincts stored. Run /opsx:instinct-status to review.
+```
+
+**Tips:**
+- Run after sessions with notable corrections or resolutions
+- Only patterns stored, not actual code or conversations
+- Evidence describes what happened, not the content
+- Confidence increases with reinforcement over time
+
+---
+
+### `/opsx:evolve`
+
+Promote high-confidence instincts into skills. Creates reusable skills from clusters of related instincts.
+
+**Syntax:**
+```
+/opsx:evolve
+```
+
+**What it does:**
+- Identifies instinct clusters with confidence >= 0.7
+- Groups related instincts by domain
+- Proposes skill/command/agent artifacts
+- Requires user approval before creation
+- Archives source instincts after evolution
+
+**Evolution criteria:**
+| Requirement | Threshold |
+|-------------|-----------|
+| Domain cluster | 3+ instincts in same domain |
+| Confidence | All >= 0.7 (strong or near-certain) |
+| Coherence | Instincts form logical pattern |
+
+**Example:**
+```
+You: /opsx:evolve
+
+AI:  Checking for evolution candidates...
+
+     Found cluster in testing domain:
+     - write-tests-first (0.9)
+     - prefer-table-driven-tests (0.8)
+     - always-run-tests-before-commit (0.7)
+
+     Proposed skill: openspec-test-driven-development
+
+     Description: Enforce TDD workflow with table-driven test patterns.
+
+     Approve evolution?
+
+You: Yes
+
+AI:  ✓ Created skill: openspec-test-driven-development
+     ✓ Archived source instincts
+
+     Skill available across all projects.
+```
+
+**Tips:**
+- Run periodically to consolidate learning
+- Evolution requires user approval
+- Source instincts are archived (not deleted)
+- Evolved skills are reusable across projects
+
+---
+
+### `/opsx:instinct-status`
+
+Display all instincts with confidence scores grouped by domain.
+
+**Syntax:**
+```
+/opsx:instinct-status
+```
+
+**What it does:**
+- Reads all instincts from `~/.openspec/instincts/`
+- Groups by domain (code-style, testing, git, etc.)
+- Sorts by confidence (descending)
+- Identifies evolution candidates
+- Recommends next actions
+
+**Output format:**
+```
+## Instinct Status
+
+### By Domain
+
+**code-style** (3 instincts)
+- prefer-functional-style: 0.7 (strong)
+- use-explicit-names: 0.5 (moderate)
+- avoid-magic-numbers: 0.3 (tentative)
+
+**testing** (2 instincts)
+- write-tests-first: 0.9 (near-certain)
+- table-driven-tests: 0.7 (strong)
+
+### Summary
+
+- Total instincts: 5
+- Strong (>= 0.7): 3
+- Moderate (>= 0.5): 1
+- Tentative (0.3): 1
+- Evolution candidates: 1 cluster (testing)
+
+### Recommendations
+
+- testing cluster ready for evolution
+```
+
+**Confidence levels:**
+| Score | Label | Behavior |
+|-------|-------|----------|
+| 0.9 | near-certain | Core behavior, always applies |
+| 0.7 | strong | Auto-approved for application |
+| 0.5 | moderate | Applied when relevant |
+| 0.3 | tentative | Suggested only, not enforced |
+
+**Tips:**
+- Run to review what has been learned
+- Check evolution readiness before `/opsx:evolve`
+- Helps track learning progress over time
 
 ---
 
