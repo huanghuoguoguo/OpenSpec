@@ -11,19 +11,142 @@
   <a href="https://github.com/Fission-AI/OpenSpec/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/Fission-AI/OpenSpec/actions/workflows/ci.yml/badge.svg" /></a>
   <a href="https://www.npmjs.com/package/@fission-ai/openspec"><img alt="npm version" src="https://img.shields.io/npm/v/@fission-ai/openspec?style=flat-square" /></a>
   <a href="./LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square" /></a>
-  <a href="https://discord.gg/YctCnvvshC"><img alt="Discord" src="https://img.shields.io/discord/1411657095639601154?style=flat-square&logo=discord&logoColor=white&label=Discord&suffix=%20online" /></a>
 </p>
 
+> **Fork of [Fission-AI/OpenSpec](https://github.com/Fission-AI/OpenSpec)** — 
+> See [original README](https://github.com/Fission-AI/OpenSpec/blob/main/README.md) for base project details.
+
+---
+
+## This Fork
+
+Enhanced OpenSpec with features inspired by [Superpowers](https://github.com/anthropics/superpowers):
+
+### What's New
+
+| Feature | Description |
+|---------|-------------|
+| **Adaptive Brainstorm** | `/opsx:brainstorm` auto-selects depth based on problem complexity |
+| **Iron Law Verification** | `/opsx:verify` enforces "evidence before claims" |
+| **Learning System** | `/opsx:learn` captures patterns across sessions |
+
+### Design Philosophy
+
+```
+→ fast + accurate + token-efficient
+→ adaptive complexity (simple mode for simple problems)
+→ cross-session knowledge retention
+```
+
+---
+
+## Quick Start
+
+```text
+# 1. Brainstorm first (adaptive depth)
+/opsx:brainstorm add authentication system
+
+# 2. Propose when ready
+/opsx:propose add-auth-system
+
+# 3. Implement
+/opsx:apply
+
+# 4. Verify (iron law enforced)
+/opsx:verify
+
+# 5. Archive
+/opsx:archive
+```
+
+### Brainstorm Modes
+
+Auto-selected based on complexity signals:
+
+| Simple | Complex |
+|--------|---------|
+| 2-3 questions | Architecture scan + diagrams |
+| ~300 tokens | ~2000 tokens |
+| 4 turns max | 6-8 turns, section-by-section |
+
+```text
+# Simple problem
+You: /opsx:brainstorm add logout button
+AI:  Simple mode (single component).
+     Three approaches: A (header), B (settings), C (both).
+     Recommend: A. Which direction?
+
+# Complex problem  
+You: /opsx:brainstorm add authentication
+AI:  Complex mode (cross-cutting).
+     
+     ┌───────────────────────┐
+     │    ARCHITECTURE        │
+     │  API → Session Store   │
+     └───────────────────────┘
+     
+     | Approach | Pros | Cons |
+     | JWT      | Stateless | Token mgmt |
+     | Session  | Simple | Server state |
+     
+     Recommend: JWT (your API is stateless).
+```
+
+### Iron Law Verification
+
+Verification must show evidence, not vague claims:
+
+```text
+✓ COMPLIANT
+  Evidence: test_auth.py:45 PASSED
+  Run: pytest auth/tests/ -v
+
+✗ NON-COMPLIANT
+  Evidence: 未找到测试
+  Action: 需运行测试并提供结果
+```
+
+No weasel words allowed: "看起来"、"应该"、"部分完成"。
+
+### Learning System
+
+Patterns captured across sessions:
+
+```text
+# After session
+/opsx:learn
+
+# Review learning
+/opsx:instinct-status
+
+## Instinct Status
+
+**code-style** (2 instincts)
+- prefer-functional: 0.7 (strong)
+- avoid-magic-numbers: 0.3 (tentative)
+
+**testing** (1 instinct)
+- write-tests-first: 0.9 (near-certain)
+
+# Promote high-confidence patterns to skills
+/opsx:evolve
+```
+
+---
+
+## Docs
+
+→ **[Commands](docs/commands.md)**: full slash command reference<br>
+→ **[Concepts](docs/concepts.md)**: how it all fits together<br>
+→ **[Workflows](docs/workflows.md)**: common patterns
+
+---
+
 <details>
-<summary><strong>The most loved spec framework.</strong></summary>
+<summary><strong>Original OpenSpec Info</strong></summary>
 
-[![Stars](https://img.shields.io/github/stars/Fission-AI/OpenSpec?style=flat-square&label=Stars)](https://github.com/Fission-AI/OpenSpec/stargazers)
-[![Downloads](https://img.shields.io/npm/dm/@fission-ai/openspec?style=flat-square&label=Downloads/mo)](https://www.npmjs.com/package/@fission-ai/openspec)
-[![Contributors](https://img.shields.io/github/contributors/Fission-AI/OpenSpec?style=flat-square&label=Contributors)](https://github.com/Fission-AI/OpenSpec/graphs/contributors)
-
-</details>
 <p></p>
-Our philosophy:
+Original philosophy:
 
 ```text
 → fluid not rigid
@@ -33,22 +156,11 @@ Our philosophy:
 → scalable from personal projects to enterprises
 ```
 
-> [!TIP]
-> **New workflow now available!** We've rebuilt OpenSpec with a new artifact-guided workflow.
->
-> Run `/opsx:propose "your idea"` to get started. → [Learn more here](docs/opsx.md)
-
-<p align="center">
-  Follow <a href="https://x.com/0xTab">@0xTab on X</a> for updates · Join the <a href="https://discord.gg/YctCnvvshC">OpenSpec Discord</a> for help and questions.
-</p>
-
 ### Teams
 
 Using OpenSpec in a team? [Email here](mailto:teams@openspec.dev) for access to our Slack channel.
 
-<!-- TODO: Add GIF demo of /opsx:propose → /opsx:archive workflow -->
-
-## See it in action
+### See it in action
 
 ```text
 You: /opsx:propose add-dark-mode
@@ -81,45 +193,7 @@ AI:  Archived to openspec/changes/archive/2025-01-23-add-dark-mode/
 
 </details>
 
-## Quick Start
-
-**Requires Node.js 20.19.0 or higher.**
-
-Install OpenSpec globally:
-
-```bash
-npm install -g @fission-ai/openspec@latest
-```
-
-Then navigate to your project directory and initialize:
-
-```bash
-cd your-project
-openspec init
-```
-
-Now tell your AI: `/opsx:propose <what-you-want-to-build>`
-
-If you want the expanded workflow (`/opsx:new`, `/opsx:continue`, `/opsx:ff`, `/opsx:verify`, `/opsx:sync`, `/opsx:bulk-archive`, `/opsx:onboard`), select it with `openspec config profile` and apply with `openspec update`.
-
-> [!NOTE]
-> Not sure if your tool is supported? [View the full list](docs/supported-tools.md) – we support 25+ tools and growing.
->
-> Also works with pnpm, yarn, bun, and nix. [See installation options](docs/installation.md).
-
-## Docs
-
-→ **[Getting Started](docs/getting-started.md)**: first steps<br>
-→ **[Workflows](docs/workflows.md)**: combos and patterns<br>
-→ **[Commands](docs/commands.md)**: slash commands & skills<br>
-→ **[CLI](docs/cli.md)**: terminal reference<br>
-→ **[Supported Tools](docs/supported-tools.md)**: tool integrations & install paths<br>
-→ **[Concepts](docs/concepts.md)**: how it all fits<br>
-→ **[Multi-Language](docs/multi-language.md)**: multi-language support<br>
-→ **[Customization](docs/customization.md)**: make it yours
-
-
-## Why OpenSpec?
+### Why OpenSpec?
 
 AI coding assistants are powerful but unpredictable when requirements live only in chat history. OpenSpec adds a lightweight spec layer so you agree on what to build before any code is written.
 
@@ -128,75 +202,30 @@ AI coding assistants are powerful but unpredictable when requirements live only 
 - **Work fluidly** — update any artifact anytime, no rigid phase gates
 - **Use your tools** — works with 20+ AI assistants via slash commands
 
-### How we compare
+### Installation
 
-**vs. [Spec Kit](https://github.com/github/spec-kit)** (GitHub) — Thorough but heavyweight. Rigid phase gates, lots of Markdown, Python setup. OpenSpec is lighter and lets you iterate freely.
-
-**vs. [Kiro](https://kiro.dev)** (AWS) — Powerful but you're locked into their IDE and limited to Claude models. OpenSpec works with the tools you already use.
-
-**vs. nothing** — AI coding without specs means vague prompts and unpredictable results. OpenSpec brings predictability without the ceremony.
-
-## Updating OpenSpec
-
-**Upgrade the package**
+**Requires Node.js 20.19.0 or higher.**
 
 ```bash
 npm install -g @fission-ai/openspec@latest
+cd your-project
+openspec init
 ```
 
-**Refresh agent instructions**
-
-Run this inside each project to regenerate AI guidance and ensure the latest slash commands are active:
+### Updating
 
 ```bash
+npm install -g @fission-ai/openspec@latest
 openspec update
 ```
 
-## Usage Notes
+### Contributing
 
-**Model selection**: OpenSpec works best with high-reasoning models. We recommend Opus 4.5 and GPT 5.2 for both planning and implementation.
-
-**Context hygiene**: OpenSpec benefits from a clean context window. Clear your context before starting implementation and maintain good context hygiene throughout your session.
-
-## Contributing
-
-**Small fixes** — Bug fixes, typo corrections, and minor improvements can be submitted directly as PRs.
-
-**Larger changes** — For new features, significant refactors, or architectural changes, please submit an OpenSpec change proposal first so we can align on intent and goals before implementation begins.
-
-When writing proposals, keep the OpenSpec philosophy in mind: we serve a wide variety of users across different coding agents, models, and use cases. Changes should work well for everyone.
-
-**AI-generated code is welcome** — as long as it's been tested and verified. PRs containing AI-generated code should mention the coding agent and model used (e.g., "Generated with Claude Code using claude-opus-4-5-20251101").
-
-### Development
-
-- Install dependencies: `pnpm install`
-- Build: `pnpm run build`
-- Test: `pnpm test`
-- Develop CLI locally: `pnpm run dev` or `pnpm run dev:cli`
-- Conventional commits (one-line): `type(scope): subject`
-
-## Other
-
-<details>
-<summary><strong>Telemetry</strong></summary>
-
-OpenSpec collects anonymous usage stats.
-
-We collect only command names and version to understand usage patterns. No arguments, paths, content, or PII. Automatically disabled in CI.
-
-**Opt-out:** `export OPENSPEC_TELEMETRY=0` or `export DO_NOT_TRACK=1`
+See [original README](https://github.com/Fission-AI/OpenSpec/blob/main/README.md) for contribution guidelines.
 
 </details>
 
-<details>
-<summary><strong>Maintainers & Advisors</strong></summary>
-
-See [MAINTAINERS.md](MAINTAINERS.md) for the list of core maintainers and advisors who help guide the project.
-
-</details>
-
-
+---
 
 ## License
 
