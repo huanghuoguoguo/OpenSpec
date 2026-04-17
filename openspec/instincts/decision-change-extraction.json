@@ -1,0 +1,12 @@
+{
+  "id": "decision-change-extraction",
+  "trigger": "when extracting patterns from completed change",
+  "action": "Extract patterns from design.md decisions and tasks.md implementation steps",
+  "confidence": 0.3,
+  "domain": "workflow",
+  "evidence": [
+    "Design decision from change integrate-learn-with-archive: D3 模式提取来源"
+  ],
+  "created_at": "2026-04-17T10:15:00Z",
+  "updated_at": "2026-04-17T10:15:00Z"
+}

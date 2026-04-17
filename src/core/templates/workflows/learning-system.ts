@@ -3,6 +3,7 @@
  *
  * Captures patterns from sessions and evolves them into skills.
  */
+import path from 'path';
 import type { SkillTemplate } from '../types.js';
 
 // Instinct JSON Schema
@@ -34,6 +35,25 @@ export const CONFIDENCE_LEVELS = {
   NEAR_CERTAIN: 0.9,
 };
 
+// Storage paths
+export const USER_INSTINCTS_DIR = '.openspec/instincts';
+export const PROJECT_INSTINCTS_DIR = 'openspec/instincts';
+
+/**
+ * Get user-level instincts directory path
+ */
+export function getUserInstinctsPath(): string {
+  const homeDir = process.env.HOME || process.env.USERPROFILE || '';
+  return path.join(homeDir, USER_INSTINCTS_DIR);
+}
+
+/**
+ * Get project-level instincts directory path
+ */
+export function getProjectInstinctsPath(projectRoot: string): string {
+  return path.join(projectRoot, PROJECT_INSTINCTS_DIR);
+}
+
 export function getInstinctSchemaDescription(): string {
   return `Instinct JSON Schema:
 
@@ -64,13 +84,17 @@ Confidence Levels:
 - 0.3 (Tentative): Suggested but not enforced
 - 0.5 (Moderate): Applied when relevant
 - 0.7 (Strong): Auto-approved for application
-- 0.9 (Near-certain): Core behavior`;
+- 0.9 (Near-certain): Core behavior
+
+Storage Locations:
+- User-level: ~/.openspec/instincts/<id>.json (cross-project patterns)
+- Project-level: openspec/instincts/<id>.json (project-specific patterns)`;
 }
 
 export function getLearnSkillTemplate(): SkillTemplate {
   return {
     name: 'openspec-learn',
-    description: 'Extract patterns from current session into instincts. Use when session demonstrates reusable patterns worth remembering.',
+    description: 'Extract patterns from current session or archived change into instincts. Use `--change <name>` to extract from archived change.',
     instructions: getLearnInstructions(),
     license: 'MIT',
     compatibility: 'Requires openspec CLI.',
@@ -180,10 +204,25 @@ New instincts start at:
 ## Storage Location
 
 \`\`\`
-~/.openspec/instincts/
-  +-- <instinct-id>.json    # Individual instinct files
-  +-- index.json            # Registry with confidence scores
+~/.openspec/instincts/           # User-level (cross-project patterns)
+  +-- <instinct-id>.json         # Individual instinct files
+  +-- index.json                 # Registry with confidence scores
+
+openspec/instincts/              # Project-level (project-specific patterns)
+  +-- <instinct-id>.json         # Project-specific instincts
+  +-- index.json                 # Project registry
 \`\`\`
+
+## Destination Selection
+
+| Pattern | Destination |
+|---------|-------------|
+| Tooling preference (e.g., ripgrep) | User-level |
+| Code style (e.g., functional) | User-level |
+| Project architecture | Project-level |
+| Domain-specific decisions | Project-level |
+
+Use \`--change <name>\` option to extract from archived change (stores to project-level).
 
 ## Important Notes
 
@@ -276,37 +315,38 @@ description: <when to use>
 function getInstinctStatusInstructions(): string {
   return `Display all instincts with confidence scores grouped by domain.
 
+## Usage
+
+\`\`\`
+/opsx:instinct-status           # Show both user and project instincts
+/opsx:instinct-status --user    # Show only user-level instincts
+/opsx:instinct-status --project # Show only project-level instincts
+\`\`\`
+
 ## Output Format
 
 \`\`\`
 ## Instinct Status
 
-### By Domain
+### User-Level (~/.openspec/instincts/)
 
 **code-style** (3 instincts)
 - prefer-functional-style: 0.7 (strong)
 - use-explicit-names: 0.5 (moderate)
 - avoid-magic-numbers: 0.3 (tentative)
 
-**testing** (2 instincts)
-- write-tests-first: 0.9 (near-certain)
-- table-driven-tests: 0.7 (strong)
+### Project-Level (openspec/instincts/)
 
-**git** (1 instinct)
-- conventional-commits: 0.5 (moderate)
+**workflow** (2 instincts)
+- decision-arch-pattern: 0.3 (tentative)
+- impl-module-structure: 0.3 (tentative)
 
 ### Summary
 
-- Total instincts: 6
+- User instincts: 6
+- Project instincts: 2
 - Strong (>= 0.7): 3
-- Moderate (>= 0.5): 2
-- Tentative (0.3): 1
 - Evolution candidates: 2 clusters
-
-### Recommendations
-
-- code-style cluster ready for evolution
-- Consider evolving testing instincts into skill
 \`\`\`
 
 ## Confidence Levels
@@ -320,11 +360,13 @@ function getInstinctStatusInstructions(): string {
 
 ## Reading Instincts
 
-Load from \`~/.openspec/instincts/\`:
-1. Read all JSON files in instincts directory
-2. Group by domain
-3. Sort by confidence (descending)
-4. Identify evolution candidates
+Load from both locations:
+1. \`~/.openspec/instincts/\` (user-level)
+2. \`openspec/instincts/\` (project-level, if exists)
+3. Read all JSON files in each directory
+4. Group by domain
+5. Sort by confidence (descending)
+6. Identify evolution candidates
 
 ## Empty State
 
@@ -384,13 +426,27 @@ Session → Pattern Detection → Instinct → Reinforcement → Skill
 ## Storage
 
 \`\`\`
-~/.openspec/
+~/.openspec/                    # User-level (cross-project)
   +-- instincts/
-  |   +-- <id>.json       # Individual instincts
-  |   +-- index.json      # Registry
+  |   +-- <id>.json             # Individual instincts
+  |   +-- index.json            # Registry
   +-- skills/
-  |   +-- evolved/        # Skills from evolution
+  |   +-- evolved/              # Skills from evolution
+
+openspec/                       # Project-level (project-specific)
+  +-- instincts/
+  |   +-- <id>.json             # Project-specific instincts
+  |   +-- index.json            # Project registry
 \`\`\`
+
+## Storage Destinations
+
+| Pattern Type | Location | Reason |
+|--------------|----------|--------|
+| Tool preferences | ~/.openspec/instincts/ | Cross-project |
+| Code style | ~/.openspec/instincts/ | Cross-project |
+| Project architecture | openspec/instincts/ | Project-specific |
+| Domain decisions | openspec/instincts/ | Project-specific |
 
 ## Confidence Evolution
 
@@ -407,4 +463,67 @@ Session → Pattern Detection → Instinct → Reinforcement → Skill
 - Evidence describes observations, not content
 - User controls what gets exported
 - All data stays local`;
+}
+
+// ========== Storage Helper Functions ==========
+
+/**
+ * Create a new instinct with initial values
+ */
+export function createInstinct(
+  id: string,
+  trigger: string,
+  action: string,
+  domain: string,
+  evidence: string[]
+): Instinct {
+  const now = new Date().toISOString();
+  return {
+    id,
+    trigger,
+    action,
+    confidence: CONFIDENCE_LEVELS.TENTATIVE,
+    domain,
+    evidence,
+    created_at: now,
+    updated_at: now,
+  };
+}
+
+/**
+ * Boost confidence of an existing instinct
+ */
+export function boostConfidence(instinct: Instinct, additionalEvidence: string[]): Instinct {
+  const newConfidence = Math.min(instinct.confidence + 0.1, CONFIDENCE_LEVELS.NEAR_CERTAIN);
+  return {
+    ...instinct,
+    confidence: newConfidence,
+    evidence: [...instinct.evidence, ...additionalEvidence],
+    updated_at: new Date().toISOString(),
+  };
+}
+
+/**
+ * Determine if pattern should be stored at project-level
+ */
+export function shouldStoreAtProjectLevel(domain: string, patternContext: string): boolean {
+  // Project-specific domains
+  const projectDomains = ['workflow'];
+  // Patterns mentioning project-specific concepts
+  const projectIndicators = ['architecture', 'design decision', 'project', 'change'];
+
+  if (projectDomains.includes(domain)) return true;
+  if (projectIndicators.some(ind => patternContext.toLowerCase().includes(ind))) return true;
+
+  return false;
+}
+
+/**
+ * Get confidence label for display
+ */
+export function getConfidenceLabel(confidence: number): string {
+  if (confidence >= 0.9) return 'near-certain';
+  if (confidence >= 0.7) return 'strong';
+  if (confidence >= 0.5) return 'moderate';
+  return 'tentative';
 }

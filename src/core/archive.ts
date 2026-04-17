@@ -9,6 +9,13 @@ import {
   writeUpdatedSpec,
   type SpecUpdate,
 } from './specs-apply.js';
+import { extractPatternsFromChange } from './pattern-extraction.js';
+import {
+  type Instinct,
+  getProjectInstinctsPath,
+  createInstinct,
+  shouldStoreAtProjectLevel,
+} from './templates/workflows/learning-system.js';
 
 /**
  * Recursively copy a directory. Used when fs.rename fails (e.g. EPERM on Windows).
@@ -285,6 +292,95 @@ export class ArchiveCommand {
     await moveDirectory(changeDir, archivePath);
 
     console.log(`Change '${changeName}' archived as '${archiveName}'.`);
+
+    // Prompt for learn (pattern extraction)
+    if (!options.yes) {
+      const { confirm } = await import('@inquirer/prompts');
+      const runLearn = await confirm({
+        message: 'Archive complete. Would you like to capture patterns from this change?',
+        default: true
+      });
+
+      if (runLearn) {
+        try {
+          const patterns = await this.extractAndStorePatterns(archivePath, changeName, targetPath);
+          if (patterns.length > 0) {
+            console.log(chalk.green(`\n✓ Patterns captured: ${patterns.length} new instincts stored.`));
+          } else {
+            console.log(chalk.yellow('\nNo new patterns detected from this change.'));
+          }
+        } catch (err: any) {
+          // Log but don't throw - learn failure should not affect archive
+          console.log(chalk.yellow(`\n⚠ Pattern extraction skipped: ${err.message || err}`));
+        }
+      } else {
+        console.log(chalk.gray('\nPatterns not captured. Run `/opsx:learn` manually if needed.'));
+      }
+    } else {
+      // With --yes flag, auto-run learn without prompting
+      try {
+        const patterns = await this.extractAndStorePatterns(archivePath, changeName, targetPath);
+        if (patterns.length > 0) {
+          console.log(chalk.green(`Patterns captured: ${patterns.length} instincts.`));
+        }
+      } catch (err: any) {
+        console.log(chalk.yellow(`Pattern extraction skipped: ${err.message || err}`));
+      }
+    }
+  }
+
+  /**
+   * Extract patterns from archived change and store as instincts
+   */
+  private async extractAndStorePatterns(
+    archivePath: string,
+    changeName: string,
+    projectRoot: string
+  ): Promise<Instinct[]> {
+    // Extract patterns from change documents
+    const patterns = await extractPatternsFromChange(archivePath, changeName);
+
+    if (patterns.length === 0) {
+      return [];
+    }
+
+    // Create project instincts directory
+    const instinctsDir = getProjectInstinctsPath(projectRoot);
+    await fs.mkdir(instinctsDir, { recursive: true });
+
+    // Store each pattern
+    for (const pattern of patterns) {
+      const instinctPath = path.join(instinctsDir, `${pattern.id}.json`);
+      await fs.writeFile(instinctPath, JSON.stringify(pattern, null, 2));
+    }
+
+    // Update index
+    const indexPath = path.join(instinctsDir, 'index.json');
+    let index: { instincts: Array<{ id: string; confidence: number; domain: string }> } = { instincts: [] };
+    try {
+      const indexContent = await fs.readFile(indexPath, 'utf-8');
+      index = JSON.parse(indexContent);
+    } catch {
+      // Index doesn't exist, start fresh
+    }
+
+    // Add new patterns to index
+    for (const pattern of patterns) {
+      const existing = index.instincts.find(i => i.id === pattern.id);
+      if (existing) {
+        existing.confidence = pattern.confidence;
+      } else {
+        index.instincts.push({
+          id: pattern.id,
+          confidence: pattern.confidence,
+          domain: pattern.domain,
+        });
+      }
+    }
+
+    await fs.writeFile(indexPath, JSON.stringify(index, null, 2));
+
+    return patterns;
   }
 
   private async selectChange(changesDir: string): Promise<string | null> {

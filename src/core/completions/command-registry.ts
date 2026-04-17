@@ -460,4 +460,65 @@ export const COMMAND_REGISTRY: CommandDefinition[] = [
       },
     ],
   },
+  {
+    name: 'worktree',
+    description: 'Manage git worktrees for parallel change development',
+    flags: [],
+    subcommands: [
+      {
+        name: 'create',
+        description: 'Create a new worktree for a change',
+        acceptsPositional: true,
+        positionalType: 'change-id',
+        flags: [
+          {
+            name: 'branch',
+            description: 'Custom branch name (default: <change>-wip)',
+            takesValue: true,
+          },
+        ],
+      },
+      {
+        name: 'list',
+        description: 'List all OpenSpec-managed worktrees',
+        flags: [COMMON_FLAGS.json],
+      },
+      {
+        name: 'merge',
+        description: 'Merge worktree changes back to main branch',
+        acceptsPositional: true,
+        positionalType: 'change-id',
+        flags: [
+          {
+            name: 'clean',
+            description: 'Clean worktree after successful merge',
+          },
+          {
+            name: 'delete-branch',
+            description: 'Delete branch after merge',
+          },
+        ],
+      },
+      {
+        name: 'clean',
+        description: 'Remove a worktree (or all worktrees with --all)',
+        acceptsPositional: true,
+        positionalType: 'change-id',
+        flags: [
+          {
+            name: 'all',
+            description: 'Clean all OpenSpec worktrees',
+          },
+          {
+            name: 'delete-branch',
+            description: 'Delete associated branch',
+          },
+          {
+            name: 'force',
+            description: 'Force clean even with uncommitted changes',
+          },
+        ],
+      },
+    ],
+  },
 ];

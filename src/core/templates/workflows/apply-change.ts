@@ -9,10 +9,14 @@ import type { SkillTemplate, CommandTemplate } from '../types.js';
 export function getApplyChangeSkillTemplate(): SkillTemplate {
   return {
     name: 'openspec-apply-change',
-    description: 'Implement tasks from an OpenSpec change. Use when the user wants to start implementing, continue implementation, or work through tasks.',
+    description: 'Implement tasks from an OpenSpec change. Use when the user wants to start implementing, continue implementation, or work through tasks. Supports worktree isolation with --worktree flag.',
     instructions: `Implement tasks from an OpenSpec change.
 
 **Input**: Optionally specify a change name. If omitted, check if it can be inferred from conversation context. If vague or ambiguous you MUST prompt for available changes.
+
+**Flags**:
+- \`--worktree\`: Execute in isolated git worktree (parallel development)
+- \`--merge\`: Automatically merge after completion (requires --worktree)
 
 **Steps**
 
@@ -25,7 +29,16 @@ export function getApplyChangeSkillTemplate(): SkillTemplate {
 
    Always announce: "Using change: <name>" and how to override (e.g., \`/opsx:apply <other>\`).
 
-2. **Check status to understand the schema**
+2. **Worktree Isolation (if --worktree flag)**
+
+   If user requests worktree isolation:
+   - Run \`openspec worktree create <change>\` to create isolated worktree
+   - Announce worktree path and branch
+   - If using Agent tool, dispatch with \`isolation: "worktree"\`
+   - Agent executes tasks in worktree directory
+   - After completion, prompt for merge
+
+3. **Check status to understand the schema**
    \`\`\`bash
    openspec status --change "<name>" --json
    \`\`\`
@@ -33,7 +46,7 @@ export function getApplyChangeSkillTemplate(): SkillTemplate {
    - \`schemaName\`: The workflow being used (e.g., "spec-driven")
    - Which artifact contains the tasks (typically "tasks" for spec-driven, check status for others)
 
-3. **Get apply instructions**
+4. **Get apply instructions**
 
    \`\`\`bash
    openspec instructions apply --change "<name>" --json
@@ -50,14 +63,14 @@ export function getApplyChangeSkillTemplate(): SkillTemplate {
    - If \`state: "all_done"\`: congratulate, suggest archive
    - Otherwise: proceed to implementation
 
-4. **Read context files**
+5. **Read context files**
 
    Read every file path listed under \`contextFiles\` from the apply instructions output.
    The files depend on the schema being used:
    - **spec-driven**: proposal, specs, design, tasks
    - Other schemas: follow the contextFiles from CLI output
 
-5. **Show current progress**
+6. **Show current progress**
 
    Display:
    - Schema being used
@@ -65,7 +78,7 @@ export function getApplyChangeSkillTemplate(): SkillTemplate {
    - Remaining tasks overview
    - Dynamic instruction from CLI
 
-6. **Implement tasks (loop until done or blocked)**
+7. **Implement tasks (loop until done or blocked)**
 
    For each pending task:
    - Show which task is being worked on
@@ -80,13 +93,20 @@ export function getApplyChangeSkillTemplate(): SkillTemplate {
    - Error or blocker encountered → report and wait for guidance
    - User interrupts
 
-7. **On completion or pause, show status**
+8. **On completion or pause, show status**
 
    Display:
    - Tasks completed this session
    - Overall progress: "N/M tasks complete"
    - If all done: suggest archive
    - If paused: explain why and wait for guidance
+
+9. **Post-apply merge (if worktree mode)**
+
+   If worktree isolation was used:
+   - Display: "Implementation complete in worktree. Merge to main?"
+   - If user confirms: run \`openspec worktree merge <worktree> --clean\`
+   - If user declines: preserve worktree for later manual merge
 
 **Output During Implementation**
 

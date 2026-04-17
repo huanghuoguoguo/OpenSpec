@@ -1,0 +1,12 @@
+{
+  "id": "impl-module-structure",
+  "trigger": "when implementing new features",
+  "action": "Create module structure first, then add tests, then document",
+  "confidence": 0.3,
+  "domain": "workflow",
+  "evidence": [
+    "Implementation pattern from change integrate-learn-with-archive: tasks flow"
+  ],
+  "created_at": "2026-04-17T10:15:00Z",
+  "updated_at": "2026-04-17T10:15:00Z"
+}

@@ -1,0 +1,12 @@
+{
+  "id": "decision-soft-integration",
+  "trigger": "when integrating archive with learn",
+  "action": "Use soft integration (prompt user) instead of auto execution",
+  "confidence": 0.3,
+  "domain": "workflow",
+  "evidence": [
+    "Design decision from change integrate-learn-with-archive: D1 集成方式"
+  ],
+  "created_at": "2026-04-17T10:15:00Z",
+  "updated_at": "2026-04-17T10:15:00Z"
+}

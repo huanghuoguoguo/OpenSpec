@@ -13,6 +13,7 @@ The OpenSpec CLI (`openspec`) provides terminal commands for project setup, vali
 | **Workflow** | `status`, `instructions`, `templates`, `schemas` | Artifact-driven workflow support |
 | **Schemas** | `schema init`, `schema fork`, `schema validate`, `schema which` | Create and manage custom workflows |
 | **Config** | `config` | View and modify settings |
+| **Worktree** | `worktree create`, `worktree list`, `worktree merge`, `worktree clean` | Parallel change development |
 | **Utility** | `feedback`, `completion` | Feedback and shell integration |
 
 ---
@@ -903,6 +904,126 @@ openspec completion generate bash > ~/.bash_completion.d/openspec
 
 # Uninstall
 openspec completion uninstall
+```
+
+---
+
+## Worktree Commands
+
+Manage git worktrees for parallel change development. Requires git >= 2.5.
+
+### `openspec worktree create <change>`
+
+Create a new worktree for a change, enabling isolated implementation.
+
+**Usage:**
+```bash
+openspec worktree create add-auth-system
+```
+
+**What it does:**
+- Creates worktree at `.worktrees/openspec-<change>-<hash>/`
+- Creates branch `<change>-wip`
+- Checks out worktree to that branch
+
+**Options:**
+| Option | Description |
+|--------|-------------|
+| `--branch <name>` | Custom branch name (default: `<change>-wip`) |
+
+**Output:**
+```
+✓ Created worktree for 'add-auth-system'
+  Path: .worktrees/openspec-add-auth-system-a1b2c3
+  Branch: add-auth-system-wip
+
+Run tasks in the worktree:
+  cd ".worktrees/openspec-add-auth-system-a1b2c3"
+  /opsx:apply
+```
+
+### `openspec worktree list`
+
+List all OpenSpec-managed worktrees.
+
+**Usage:**
+```bash
+openspec worktree list
+openspec worktree list --json
+```
+
+**Output (text):**
+```
+OpenSpec Worktrees:
+
+  add-auth-system (active)
+    Path: .worktrees/openspec-add-auth-system-a1b2c3
+    Branch: add-auth-system-wip
+
+  add-dark-mode (merged)
+    Path: .worktrees/openspec-add-dark-mode-d4e5f6
+    Branch: add-dark-mode-wip
+
+Total: 2 worktrees
+```
+
+**Status values:**
+| Status | Meaning |
+|--------|---------|
+| `active` | Worktree exists and is valid |
+| `merged` | Branch already merged to main |
+| `stale` | Worktree directory exists but git invalid |
+
+### `openspec worktree merge <worktree>`
+
+Merge worktree changes back to main branch.
+
+**Usage:**
+```bash
+openspec worktree merge openspec-add-auth-a1b2c3
+openspec worktree merge openspec-add-auth-a1b2c3 --clean
+```
+
+**Options:**
+| Option | Description |
+|--------|-------------|
+| `--clean` | Clean worktree after successful merge |
+| `--delete-branch` | Delete branch after merge |
+
+**On conflict:**
+```
+Merge conflict in 2 files. Resolve conflicts before proceeding.
+
+Conflicting files:
+  ✗ src/auth/login.ts
+  ✗ src/auth/session.ts
+
+Resolve conflicts then run:
+  git add <resolved-files>
+  git commit
+```
+
+### `openspec worktree clean <worktree>`
+
+Remove a worktree.
+
+**Usage:**
+```bash
+openspec worktree clean openspec-add-auth-a1b2c3
+openspec worktree clean --all
+```
+
+**Options:**
+| Option | Description |
+|--------|-------------|
+| `--all` | Clean all OpenSpec worktrees |
+| `--delete-branch` | Delete associated branch |
+| `--force` | Force clean even with uncommitted changes |
+
+**Warning on uncommitted changes:**
+```
+Warning: Worktree 'openspec-add-auth-a1b2c3' has uncommitted changes.
+Use --force to clean anyway (changes will be lost).
 ```
 
 ---

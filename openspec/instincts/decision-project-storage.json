@@ -1,0 +1,12 @@
+{
+  "id": "decision-project-storage",
+  "trigger": "when storing project-specific patterns",
+  "action": "Use openspec/instincts/ for project-level storage, separate from ~/.openspec/",
+  "confidence": 0.3,
+  "domain": "workflow",
+  "evidence": [
+    "Design decision from change integrate-learn-with-archive: D2 项目级存储位置"
+  ],
+  "created_at": "2026-04-17T10:15:00Z",
+  "updated_at": "2026-04-17T10:15:00Z"
+}

@@ -1,0 +1,39 @@
+{
+  "instincts": [
+    {
+      "id": "decision-soft-integration",
+      "confidence": 0.3,
+      "domain": "workflow"
+    },
+    {
+      "id": "decision-project-storage",
+      "confidence": 0.3,
+      "domain": "workflow"
+    },
+    {
+      "id": "decision-change-extraction",
+      "confidence": 0.3,
+      "domain": "workflow"
+    },
+    {
+      "id": "impl-module-structure",
+      "confidence": 0.3,
+      "domain": "workflow"
+    },
+    {
+      "id": "decision-worktree-naming",
+      "confidence": 0.3,
+      "domain": "workflow"
+    },
+    {
+      "id": "decision-worktree-location",
+      "confidence": 0.3,
+      "domain": "workflow"
+    },
+    {
+      "id": "decision-optional-integration",
+      "confidence": 0.3,
+      "domain": "workflow"
+    }
+  ]
+}

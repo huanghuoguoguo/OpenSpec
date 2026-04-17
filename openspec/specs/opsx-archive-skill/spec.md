@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Define the expected behavior for the `/opsx:archive` skill, including readiness checks, spec sync prompting, archive execution, and user-facing output.
+Define the expected behavior for the `/opsx:archive` skill, including readiness checks, spec sync prompting, archive execution, learn integration, and user-facing output.
 
 ## Requirements
 
@@ -17,12 +17,20 @@ The system SHALL provide an `/opsx:archive` skill that archives completed change
 - **AND** all tasks are complete
 - **THEN** the agent moves the change to `openspec/changes/archive/YYYY-MM-DD-<name>/`
 - **AND** displays success message with archived location
+- **AND** prompts user to run learn for pattern capture
 
 #### Scenario: Change selection prompt
 
 - **WHEN** agent executes `/opsx:archive` without specifying a change
 - **THEN** the agent prompts user to select from available changes
 - **AND** shows only active changes (excludes archive/)
+
+#### Scenario: Learn prompt after archive
+
+- **WHEN** archive completes successfully
+- **THEN** agent displays: "Archive complete. Would you like to capture patterns from this change?"
+- **AND** if user confirms, agent executes learn logic with change context
+- **AND** if user declines, agent displays final summary only
 
 ### Requirement: Artifact Completion Check
 
@@ -126,3 +134,19 @@ The skill SHALL provide clear feedback about the archive operation.
 - **WHEN** archive completes with incomplete artifacts or tasks
 - **THEN** include note about what was incomplete
 - **AND** suggest reviewing if archive was intentional
+
+#### Scenario: Archive complete with learn executed
+
+- **WHEN** archive completes and user accepts learn prompt
+- **THEN** display summary:
+  - Change archived to location
+  - Patterns captured (count of new/updated instincts)
+  - Schema that was used
+
+#### Scenario: Archive complete without learn
+
+- **WHEN** archive completes and user declines learn prompt
+- **THEN** display summary:
+  - Change archived to location
+  - Schema that was used
+  - Note: "Patterns not captured. Run `/opsx:learn` manually if needed."

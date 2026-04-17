@@ -567,7 +567,7 @@ AI:  Syncing add-dark-mode delta specs...
 
 ### `/opsx:archive`
 
-Archive a completed change. Finalizes the change and moves it to the archive folder.
+Archive a completed change. Finalizes the change and moves it to the archive folder. Optionally captures patterns from the change.
 
 **Syntax:**
 ```
@@ -584,6 +584,7 @@ Archive a completed change. Finalizes the change and moves it to the archive fol
 - Checks task completion (warns if incomplete)
 - Offers to sync delta specs if not already synced
 - Moves change folder to `openspec/changes/archive/YYYY-MM-DD-<name>/`
+- **Prompts to capture patterns** from the change (project-level learning)
 - Preserves all artifacts for audit trail
 
 **Example:**
@@ -606,13 +607,26 @@ You: Yes
 AI:  ✓ Synced specs to openspec/specs/ui/spec.md
      ✓ Moved to openspec/changes/archive/2025-01-24-add-dark-mode/
 
+     Archive complete. Would you like to capture patterns from this change?
+
+You: Yes
+
+AI:  ✓ Patterns captured: 3 new instincts stored at openspec/instincts/
+
      Change archived successfully.
 ```
+
+**Pattern capture:**
+When you accept the pattern capture prompt, OpenSpec extracts:
+- Design decisions from `design.md`
+- Implementation patterns from `tasks.md`
+- Stores as project-level instincts at `openspec/instincts/`
 
 **Tips:**
 - Archive won't block on incomplete tasks, but will warn
 - Delta specs can be synced during archive or beforehand
 - Archived changes are preserved for history
+- Pattern capture helps retain project-specific knowledge
 - Use `/opsx:verify` first to catch issues
 
 ---
@@ -739,18 +753,33 @@ OpenSpec includes an instinct-based learning system that captures patterns from 
 
 ### `/opsx:learn`
 
-Extract patterns from the current session into instincts. Captures user corrections, error resolutions, and repeated workflows.
+Extract patterns from the current session or an archived change into instincts. Captures user corrections, error resolutions, and repeated workflows.
 
 **Syntax:**
 ```
-/opsx:learn
+/opsx:learn [--change <name>]
 ```
 
+**Arguments:**
+| Argument | Required | Description |
+|----------|----------|-------------|
+| `--change` | No | Extract from archived change (stores to project-level) |
+
 **What it does:**
-- Analyzes session for reusable patterns
+- Analyzes session or change for reusable patterns
 - Creates instinct entries with confidence scores
-- Stores patterns at `~/.openspec/instincts/`
+- Stores patterns at appropriate location:
+  - User-level: `~/.openspec/instincts/` (cross-project patterns)
+  - Project-level: `openspec/instincts/` (project-specific patterns)
 - Starts at confidence 0.3 (tentative)
+
+**Storage destinations:**
+| Pattern Type | Location | Reason |
+|--------------|----------|--------|
+| Tool preferences | User-level | Cross-project |
+| Code style | User-level | Cross-project |
+| Project architecture | Project-level | Project-specific |
+| Design decisions | Project-level | Project-specific |
 
 **Instinct structure:**
 ```json
@@ -770,8 +799,9 @@ Extract patterns from the current session into instincts. Captures user correcti
 - User corrections ("No, use X instead")
 - Error resolutions (build/test failures that were fixed)
 - Repeated workflows (consistent preferences)
+- Design decisions (from change documents)
 
-**Example:**
+**Example (from session):**
 ```
 You: /opsx:learn
 
@@ -785,11 +815,32 @@ AI:  Analyzing session patterns...
      ✓ prefer-table-driven-tests (confidence: 0.3)
      ✓ avoid-magic-numbers (confidence: 0.3)
 
-     Instincts stored. Run /opsx:instinct-status to review.
+     Instincts stored at ~/.openspec/instincts/
+```
+
+**Example (from archived change):**
+```
+You: /opsx:learn --change add-auth-system
+
+AI:  Extracting patterns from archived change...
+
+     Reading: openspec/changes/archive/2025-01-24-add-auth-system/design.md
+     Reading: openspec/changes/archive/2025-01-24-add-auth-system/tasks.md
+
+     Patterns detected:
+     - Decision: JWT over sessions (workflow domain)
+     - Implementation: Create module structure first (workflow domain)
+
+     Created instincts:
+     ✓ decision-jwt-auth (confidence: 0.3)
+     ✓ impl-module-structure (confidence: 0.3)
+
+     Instincts stored at openspec/instincts/
 ```
 
 **Tips:**
 - Run after sessions with notable corrections or resolutions
+- Use `--change` after archiving to capture project patterns
 - Only patterns stored, not actual code or conversations
 - Evidence describes what happened, not the content
 - Confidence increases with reinforcement over time
@@ -854,15 +905,23 @@ AI:  ✓ Created skill: openspec-test-driven-development
 
 ### `/opsx:instinct-status`
 
-Display all instincts with confidence scores grouped by domain.
+Display all instincts with confidence scores grouped by domain and storage level.
 
 **Syntax:**
 ```
-/opsx:instinct-status
+/opsx:instinct-status [--user | --project]
 ```
 
+**Arguments:**
+| Argument | Required | Description |
+|----------|----------|-------------|
+| `--user` | No | Show only user-level instincts |
+| `--project` | No | Show only project-level instincts |
+
 **What it does:**
-- Reads all instincts from `~/.openspec/instincts/`
+- Reads instincts from both locations:
+  - `~/.openspec/instincts/` (user-level, cross-project)
+  - `openspec/instincts/` (project-level, project-specific)
 - Groups by domain (code-style, testing, git, etc.)
 - Sorts by confidence (descending)
 - Identifies evolution candidates
@@ -872,28 +931,29 @@ Display all instincts with confidence scores grouped by domain.
 ```
 ## Instinct Status
 
-### By Domain
+### User-Level (~/.openspec/instincts/)
 
 **code-style** (3 instincts)
 - prefer-functional-style: 0.7 (strong)
 - use-explicit-names: 0.5 (moderate)
 - avoid-magic-numbers: 0.3 (tentative)
 
-**testing** (2 instincts)
-- write-tests-first: 0.9 (near-certain)
-- table-driven-tests: 0.7 (strong)
+### Project-Level (openspec/instincts/)
+
+**workflow** (2 instincts)
+- decision-jwt-auth: 0.3 (tentative)
+- impl-module-structure: 0.3 (tentative)
 
 ### Summary
 
-- Total instincts: 5
-- Strong (>= 0.7): 3
-- Moderate (>= 0.5): 1
-- Tentative (0.3): 1
-- Evolution candidates: 1 cluster (testing)
+- User instincts: 3
+- Project instincts: 2
+- Strong (>= 0.7): 1
+- Evolution candidates: 0 clusters
 
 ### Recommendations
 
-- testing cluster ready for evolution
+- Run /opsx:learn --change after archiving to capture more project patterns
 ```
 
 **Confidence levels:**
